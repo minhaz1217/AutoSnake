@@ -52,6 +52,9 @@ public class Board extends JPanel implements ActionListener {
 
     public String snakePath = "";
     public int pathIndex =0;
+    BFS b = new BFS();
+    private final char revDir[] = {'u', 'd','r', 'l'};
+    
     public Board() {
         score = 0;
         initBoard();
@@ -219,37 +222,40 @@ public class Board extends JPanel implements ActionListener {
         r = (int) (Math.random() * RAND_POS);
         apple_y = ((r * DOT_SIZE));
     }
-
+    public char getDirectionAsChar(){
+        if(upDirection){
+            return 'u';
+        }else if(downDirection){
+            return 'd';
+        }else if(leftDirection){
+            return 'l';
+        }else{
+            return 'r';
+        }
+    }
+    
+    public int getDirectionAsInt(){
+        
+        if(upDirection){
+            return 0;
+        }else if(downDirection){
+            return 1;
+        }else if(leftDirection){
+            return 2;
+        }else{
+            return 3;
+        }
+        
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (inGame) {
-            
-                /*
-            if(snakePath == "" || snakePath.length() == pathIndex){
-                BFS b = new BFS();
-                Debug.println(x[0] + "", y[0] + "");
-                Debug.println(apple_x + "", apple_y + "");
-                snakePath = b.getDirection(1, x[0], y[0], apple_x, apple_y);
-                Debug.println(snakePath , "H");
-                pathIndex = 0;
-                
-            }else{
-                char c = snakePath.charAt(pathIndex++);
-                Debug.println(c + "", pathIndex + "");
-                goDirection(c);
-            }
-*/
 
             checkApple();
             checkCollision();
-            //drawScore();
-                BFS b = new BFS();                
-                snakePath = b.getDirection(1, x[0], y[0], apple_x, apple_y);
-                if(snakePath.length() > 0){                
-                    goDirection(snakePath.charAt(0));
-                }
-                
+            snakePath = b.directinoWithoutBody(getDirectionAsInt() , x[0], y[0], apple_x, apple_y);
+            goDirection(snakePath.charAt(0));
             move();
         }
 
@@ -258,6 +264,11 @@ public class Board extends JPanel implements ActionListener {
     
     public void goDirection(char a){
         //Debug.println("HELLO", "HI");
+        if(getDirectionAsChar() != a)
+        {
+            //Debug.println("My Dir: " +  getDirectionAsChar(), a + " Path: "+ snakePath + " REv: " + revDir[getDirectionAsInt()] );
+        }
+        
         if(a == 'u'){
             upDirection = true;
             rightDirection = false;

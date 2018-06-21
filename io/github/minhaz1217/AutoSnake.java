@@ -32,11 +32,6 @@ public class AutoSnake extends JFrame {
 
     public static void main(String[] args) {
         
-        Queue<Point> q = new LinkedList<>();
-        BFS b = new BFS();
-        b.getDirection(1, 0, 0, 50, 50);
-
-        
         EventQueue.invokeLater(() -> {
             JFrame ex = new AutoSnake();
             ex.setVisible(true);
