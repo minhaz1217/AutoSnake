@@ -29,7 +29,7 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
-    private final int DELAY = 25;
+    private final int DELAY = 15;
 
     public final int x[] = new int[ALL_DOTS];
     public final int y[] = new int[ALL_DOTS];
@@ -51,8 +51,8 @@ public class Board extends JPanel implements ActionListener {
     private Image head;
 
     public String snakePath = "";
-    public int pathIndex =0;
-    BFS b = new BFS();
+    public int pathIndex = 0;
+    BFS bfs = new BFS();
     private final char revDir[] = {'u', 'd','r', 'l'};
     
     public Board() {
@@ -254,9 +254,16 @@ public class Board extends JPanel implements ActionListener {
 
             checkApple();
             checkCollision();
-            snakePath = b.directinoWithoutBody(getDirectionAsInt() , x[0], y[0], apple_x, apple_y);
+            snakePath = bfs.directinoWithoutBody(getDirectionAsInt() , x[0], y[0], apple_x, apple_y);
+            //System.out.println("PATH: " + snakePath + " " + snakePath.length());
+//System.out.println(getDirectionAsChar() + " : " + snakePath);
+            if(snakePath.length() == 0){
+                System.out.println("ZERO");
+                snakePath = bfs.directinoWithoutBody(getDirectionAsInt() , x[0], y[0], apple_x, apple_y);
+            }
             goDirection(snakePath.charAt(0));
             move();
+            checkApple();
         }
 
         repaint();
