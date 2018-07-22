@@ -5,26 +5,38 @@
  */
 package io.github.minhaz1217;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
-import sun.security.ssl.Debug;
 
 /**
  *
  * @author Minhaz
  */
-public class BFS {
 
+
+
+public class AStar {
+    
     private final int dx[] = {0, 0, -1, 1};
     private final int dy[] = {-1, 1, 0, 0};
     private final String dir[] = {"u", "d", "l", "r"};
     private final String revDir[] = {"d", "u", "r", "l"};
-
+    
+    
+    double distance(Point a, Point b){
+        //System.out.println("A: "+ a.x + " "+ a.y + " : " + b.x + " " + b.y);
+        double ans1 = (b.x - a.x) * (b.x - a.x);
+        double ans2 = (b.y - a.y) * (b.y - a.y);
+        //System.out.println("A: " + ans1 + " B: " + ans2);
+        return Math.sqrt( ans1 + ans2 );
+    }
     public String directinoWithoutBody(int direction, int headx, int heady, int foodx, int foody) {
-        Queue<Point> q = new LinkedList<>();
+        
+        PriorityQueue<Point>pq = new PriorityQueue<>();
         //Debug.println(dir[direction] + "", revDir[direction] + "");
         int x, y, vx, vy;
+        double myCost,hcost,gcost;
         int sz = 304;
         boolean[][] visited = new boolean[sz][sz];
         for (int i = 0; i < sz; i++) {
@@ -33,12 +45,18 @@ public class BFS {
             }
         }
         String finalPath = "";
-        q.add(new Point(headx, heady, "", 0));
+        Point head = new Point(headx, heady, "", 0);
+        Point food = new Point(foodx, foody, "", 0);
+        pq.add(new Point(headx, heady, "", distance(head,food)+0));
         visited[headx][heady] = false;
-        while (q.size() > 0) {
-            Point temp = q.remove();
+        while (pq.size() > 0) {
+            Point temp = pq.remove();
             x = temp.x;
             y = temp.y;
+            myCost = temp.cost;
+            hcost = distance(food, new Point(x,y,"", 0));
+            gcost = myCost - hcost;
+            //System.out.println("GCOST: "+ gcost);
             if (x == foodx && y == foody) {
                 //System.out.println(temp.path);=
                     //System.out.println(dir[direction] + " : " + temp.path + " -> " + revDir[direction]);
@@ -54,10 +72,10 @@ public class BFS {
                     
                     if(temp.path.length() == 0){ // we just need to store the first direction move.
                         if(dir[i] != revDir[direction]){ // this is so that the snake can't go reverse direction.
-                            q.add(new Point(vx, vy, dir[i], 0));
+                            pq.add(new Point(vx, vy, dir[i], distance(food, new Point(vx,vy, "", 0)) + gcost+1    ));
                         }
                     }else{ // if the path already has first move we don't need any modification.
-                        q.add(new Point(vx, vy, temp.path, 0));
+                        pq.add(new Point(vx, vy, temp.path, distance(food, new Point(vx,vy, "", 0)) + gcost+1 ));
                     }
                     visited[vx][vy] = true;
                 }
@@ -66,33 +84,43 @@ public class BFS {
         //System.out.println("F: " + finalPath);
         return finalPath;
     }
-        public String directinoWithBody(int direction, int xx[], int yy[], int bodyLength, int foodx, int foody) {
-        Queue<Point> q = new LinkedList<>();
+    
+    
+    public String directinoWithBody(int direction, int xx[], int yy[], int bodyLength, int foodx, int foody) {
         
-        //System.out.println("X: "+ xx.length + " Y: " + yy.length);
-        //System.out.println("DOTS: " + bodyLength);
-        
-        
+        PriorityQueue<Point>pq = new PriorityQueue<>();
         //Debug.println(dir[direction] + "", revDir[direction] + "");
         int x, y, vx, vy;
+        double myCost,hcost,gcost;
         int sz = 304;
         int headx = xx[0], heady = yy[0];
-        int len = bodyLength;
         boolean[][] visited = new boolean[sz][sz];
+        int len = bodyLength;
         for (int i = 0; i < sz; i++) {
             for (int j = 0; j < sz; j++) {
                 visited[i][j] = false;
             }
         }
+        
         String finalPath = "";
-        q.add(new Point(headx, heady, "", 0));
+        Point head = new Point(headx, heady, "", 0);
+        Point food = new Point(foodx, foody, "", 0);
+        pq.add(new Point(headx, heady, "", distance(head,food)+0));
         visited[headx][heady] = false;
-        while (q.size() > 0) {
-            Point temp = q.remove();
+        while (pq.size() > 0) {
+            Point temp = pq.remove();
             x = temp.x;
             y = temp.y;
+            myCost = temp.cost;
+            hcost = distance(food, new Point(x,y,"", 0));
+            gcost = myCost - hcost;
+            //System.out.println("GCOST: "+ gcost);
             if (x == foodx && y == foody) {
+                //System.out.println(temp.path);=
+                    //System.out.println(dir[direction] + " : " + temp.path + " -> " + revDir[direction]);
                 finalPath = temp.path;
+                //Debug.println(dir[direction] + "", revDir[direction] + "");
+                //Debug.println(finalPath, "path");
                 break;
             }
             for (int i = 0; i < 4; i++) {
@@ -103,22 +131,20 @@ public class BFS {
                         if( !(vx == xx[j] && vy == yy[j]) ){
                             if(temp.path.length() == 0){ // we just need to store the first direction move.
                                 if(dir[i] != revDir[direction]){ // this is so that the snake can't go reverse direction.
-                                    q.add(new Point(vx, vy, dir[i], 0));
+                                    pq.add(new Point(vx, vy, dir[i], distance(food, new Point(vx,vy, "", 0)) + gcost+1    ));
                                 }
                             }else{ // if the path already has first move we don't need any modification.
-                                q.add(new Point(vx, vy, temp.path, 0));
+                                pq.add(new Point(vx, vy, temp.path, distance(food, new Point(vx,vy, "", 0)) + gcost+1 ));
                             }
                             visited[vx][vy] = true;
                         }
                     }
-
                 }
             }
         }
         //System.out.println("F: " + finalPath);
         return finalPath;
-
+    
         //return "";
     }
-
 }

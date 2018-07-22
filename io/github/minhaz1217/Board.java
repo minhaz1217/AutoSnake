@@ -17,10 +17,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Console;
+import java.util.PriorityQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import sun.security.ssl.Debug;
+import io.github.minhaz1217.Point;
+
 
 public class Board extends JPanel implements ActionListener {
 
@@ -29,7 +32,10 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
-    private final int DELAY = 15;
+    private final int DELAY = 25;
+    
+    
+    
 
     public final int x[] = new int[ALL_DOTS];
     public final int y[] = new int[ALL_DOTS];
@@ -50,9 +56,14 @@ public class Board extends JPanel implements ActionListener {
     private Image apple;
     private Image head;
 
+    
+    
+    private final int AI_MODE = 4; // 1 for bfs without body, 2 for bfs with body
+    
     public String snakePath = "";
     public int pathIndex = 0;
     BFS bfs = new BFS();
+    AStar astar = new AStar();
     private final char revDir[] = {'u', 'd','r', 'l'};
     
     public Board() {
@@ -102,14 +113,11 @@ public class Board extends JPanel implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         doDrawing(g);
     }
     
     private void doDrawing(Graphics g) {
-        
         if (inGame) {
-
             g.drawImage(apple, apple_x, apple_y, this);
 
             for (int z = 0; z < dots; z++) {
@@ -123,13 +131,11 @@ public class Board extends JPanel implements ActionListener {
             Toolkit.getDefaultToolkit().sync();
 
         } else {
-
             gameOver(g);
         }        
     }
 
     private void gameOver(Graphics g) {
-        
         String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
@@ -151,9 +157,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void checkApple() {
-
         if ((x[0] == apple_x) && (y[0] == apple_y)) {
-
             dots++;
             score++;
             locateApple();
@@ -161,7 +165,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void move() {
-
         for (int z = dots; z > 0; z--) {
             x[z] = x[(z - 1)];
             y[z] = y[(z - 1)];
@@ -185,7 +188,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void checkCollision() {
-
         for (int z = dots; z > 0; z--) {
 
             if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
@@ -234,8 +236,7 @@ public class Board extends JPanel implements ActionListener {
         }
     }
     
-    public int getDirectionAsInt(){
-        
+    public int getDirectionAsInt(){       
         if(upDirection){
             return 0;
         }else if(downDirection){
@@ -245,22 +246,45 @@ public class Board extends JPanel implements ActionListener {
         }else{
             return 3;
         }
-        
     }
+    public void endGame(){
+        inGame = false;
+    }
+    public void startGame(){
+        inGame = true;
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (inGame) {
-
             checkApple();
             checkCollision();
-            snakePath = bfs.directinoWithoutBody(getDirectionAsInt() , x[0], y[0], apple_x, apple_y);
-            //System.out.println("PATH: " + snakePath + " " + snakePath.length());
-//System.out.println(getDirectionAsChar() + " : " + snakePath);
-            if(snakePath.length() == 0){
-                System.out.println("ZERO");
+            
+            if(AI_MODE == 1){
                 snakePath = bfs.directinoWithoutBody(getDirectionAsInt() , x[0], y[0], apple_x, apple_y);
+                if(snakePath.length() == 0){
+                    System.out.println("ZERO");
+                    snakePath = bfs.directinoWithoutBody(getDirectionAsInt() , x[0], y[0], apple_x, apple_y);
+                }
+            }else if(AI_MODE == 2){
+                //System.out.println("X: "+ x.length + " Y: " + y.length);
+                //snakePath = bfs.directinoWithBody(getDirectionAsInt(), x, y, dots, apple_x, apple_y);
+            }else if(AI_MODE == 3){
+                snakePath = astar.directinoWithoutBody(getDirectionAsInt(), x[0], y[0], apple_x, apple_y);
+            }else if(AI_MODE == 4){
+                snakePath = astar.directinoWithBody(getDirectionAsInt(), x, y,dots, apple_x, apple_y);
             }
+            else{
+                snakePath = "r";
+            }
+            
+
+            
+            //System.out.println("PATH: " + snakePath + " " + snakePath.length());
+            //System.out.println(getDirectionAsChar() + " : " + snakePath);
+            //endGame();
+            
+            
             goDirection(snakePath.charAt(0));
             move();
             checkApple();
