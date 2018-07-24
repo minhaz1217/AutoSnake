@@ -11,7 +11,9 @@ import java.util.Queue;
 import javax.swing.JFrame;
 
 public class AutoSnake extends JFrame {
-
+    public int delay = 23;
+    public int ai_mode = 1;
+    
     public AutoSnake() {
         
         initUI();

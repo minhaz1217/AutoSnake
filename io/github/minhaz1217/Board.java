@@ -22,7 +22,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import sun.security.ssl.Debug;
-import io.github.minhaz1217.Point;
 
 
 public class Board extends JPanel implements ActionListener {
@@ -32,7 +31,7 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
-    private final int DELAY = 25;
+    private final int DELAY = 23;
     
     
     
@@ -58,7 +57,7 @@ public class Board extends JPanel implements ActionListener {
 
     
     
-    private final int AI_MODE = 4; // 1 for bfs without body, 2 for bfs with body
+    private final int AI_MODE = 2; // 1 for bfs without body, 2 for bfs with body
     
     public String snakePath = "";
     public int pathIndex = 0;
@@ -268,24 +267,26 @@ public class Board extends JPanel implements ActionListener {
                 }
             }else if(AI_MODE == 2){
                 //System.out.println("X: "+ x.length + " Y: " + y.length);
-                //snakePath = bfs.directinoWithBody(getDirectionAsInt(), x, y, dots, apple_x, apple_y);
+                snakePath = bfs.directinoWithBody(getDirectionAsInt(), x, y, dots, apple_x, apple_y);
             }else if(AI_MODE == 3){
                 snakePath = astar.directinoWithoutBody(getDirectionAsInt(), x[0], y[0], apple_x, apple_y);
             }else if(AI_MODE == 4){
                 snakePath = astar.directinoWithBody(getDirectionAsInt(), x, y,dots, apple_x, apple_y);
             }
             else{
-                snakePath = "r";
+                snakePath = "";
             }
             
 
+            if(AI_MODE != 0){
+                goDirection(snakePath.charAt(0));
             
+            }
             //System.out.println("PATH: " + snakePath + " " + snakePath.length());
             //System.out.println(getDirectionAsChar() + " : " + snakePath);
             //endGame();
             
             
-            goDirection(snakePath.charAt(0));
             move();
             checkApple();
         }

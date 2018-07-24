@@ -16,8 +16,8 @@ import sun.security.ssl.Debug;
  */
 public class BFS {
 
-    private final int dx[] = {0, 0, -1, 1};
-    private final int dy[] = {-1, 1, 0, 0};
+    private final int dx[] = {0, 0, -10, 10};
+    private final int dy[] = {-10, 10, 0, 0};
     private final String dir[] = {"u", "d", "l", "r"};
     private final String revDir[] = {"d", "u", "r", "l"};
 
@@ -84,10 +84,16 @@ public class BFS {
                 visited[i][j] = false;
             }
         }
+        for(int i =0;i<=len;i++){
+            //visited[xx[i]][yy[i]] = true;
+            
+        }
+        
         String finalPath = "";
         q.add(new Point(headx, heady, "", 0));
         visited[headx][heady] = false;
         while (q.size() > 0) {
+//            System.out.println("HI");
             Point temp = q.remove();
             x = temp.x;
             y = temp.y;
@@ -98,7 +104,17 @@ public class BFS {
             for (int i = 0; i < 4; i++) {
                 vx = x + dx[i];
                 vy = y + dy[i];
+                
                 if (!(vx < 0 || vx > 300 || vy < 0 || vy > 300) && !visited[vx][vy]) {
+                    if(temp.path.length() == 0){ // we just need to store the first direction move.
+                        if(dir[i] != revDir[direction]){ // this is so that the snake can't go reverse direction.
+                            q.add(new Point(vx, vy, dir[i], 0));
+                        }
+                    }else{ // if the path already has first move we don't need any modification.
+                        q.add(new Point(vx, vy, temp.path, 0));
+                    }
+                    visited[vx][vy] = true;
+                    /*
                     for(int j=0;j<=len;j++){
                         if( !(vx == xx[j] && vy == yy[j]) ){
                             if(temp.path.length() == 0){ // we just need to store the first direction move.
@@ -111,6 +127,7 @@ public class BFS {
                             visited[vx][vy] = true;
                         }
                     }
+*/
 
                 }
             }
